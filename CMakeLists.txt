@@ -16,6 +16,7 @@ set(SOURCES
     src/Inventory.cpp
     src/Bill.cpp
     src/BillingSystem.cpp
+    src/AuthManager.cpp
     src/main.cpp
 )
 
@@ -26,4 +27,19 @@ add_executable(server ${SOURCES})
 if(WIN32)
     target_link_libraries(server PRIVATE ws2_32 mswsock)
     target_link_options(server PRIVATE -static -static-libgcc -static-libstdc++)
+endif()
+
+# Automated Test Executable
+add_executable(test_auth
+    tests/test_auth.cpp
+    src/Product.cpp
+    src/Inventory.cpp
+    src/Bill.cpp
+    src/BillingSystem.cpp
+    src/AuthManager.cpp
+)
+
+if(WIN32)
+    target_link_libraries(test_auth PRIVATE ws2_32 mswsock)
+    target_link_options(test_auth PRIVATE -static -static-libgcc -static-libstdc++)
 endif()

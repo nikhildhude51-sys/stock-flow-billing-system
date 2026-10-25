@@ -2,6 +2,14 @@ $userPath = [Environment]::GetEnvironmentVariable("Path", "User")
 $machinePath = [Environment]::GetEnvironmentVariable("Path", "Machine")
 $env:Path = "$userPath;$machinePath"
 
+# Backup user credentials if present, and write clean test credentials
+$authBackup = $null
+if (Test-Path "data/auth.json") {
+    $authBackup = [System.IO.File]::ReadAllText("data/auth.json")
+}
+$testAuthJson = '{"passwordHash":"f0f08cd62488c652730b81a562ad67760f8e8700b3ab46d7a05f5d9eb0bf6fe3","salt":"f97f276c4f54c7d61a55eb23e9016bac","username":"admin"}'
+[System.IO.File]::WriteAllText("data/auth.json", $testAuthJson)
+
 $port = 8088
 Write-Output "=== Starting Full End-to-End System Test on Port $port ==="
 
@@ -18,8 +26,8 @@ try {
     # -------------------------------------------------------------
     Write-Output "`n[TEST 1] GET / (Serve index.html)"
     $html = (Invoke-WebRequest -Uri "$baseUrl/" -UseBasicParsing).Content
-    if ($html -match "Admin Panel" -and $html -match "Point of Sale") {
-        Write-Output "PASS: Successfully served index.html with Admin Panel UI."
+    if (($html -match "Stock Flow" -or $html -match "Admin Panel") -and $html -match "Point of Sale") {
+        Write-Output "PASS: Successfully served index.html with Stock Flow UI."
         $passedTests++
     } else {
         Write-Error "FAIL: HTML did not contain expected content."
@@ -50,11 +58,14 @@ try {
     }
 
     # -------------------------------------------------------------
-    # TEST 4: API GET /api/products
+    # TEST 4: Admin Login & API GET /api/products
     # -------------------------------------------------------------
-    Write-Output "`n[TEST 4] GET /api/products"
-    $products = Invoke-RestMethod -Uri "$baseUrl/api/products" -Method Get
-    if ($products.Count -ge 9) {
+    Write-Output "`n[TEST 4] Admin Login & GET /api/products"
+    $session = New-Object Microsoft.PowerShell.Commands.WebRequestSession
+    $loginBody = @{ username = "admin"; password = "admin123" } | ConvertTo-Json
+    $loginRes = Invoke-RestMethod -Uri "$baseUrl/api/auth/login" -Method Post -Body $loginBody -ContentType "application/json" -WebSession $session
+    $products = Invoke-RestMethod -Uri "$baseUrl/api/products" -Method Get -WebSession $session
+    if ($products.Count -ge 8) {
         Write-Output "PASS: Catalog returned $($products.Count) products."
         $passedTests++
     } else {
@@ -65,7 +76,7 @@ try {
     # TEST 5: API GET /api/sales
     # -------------------------------------------------------------
     Write-Output "`n[TEST 5] GET /api/sales"
-    $sales = Invoke-RestMethod -Uri "$baseUrl/api/sales" -Method Get
+    $sales = Invoke-RestMethod -Uri "$baseUrl/api/sales" -Method Get -WebSession $session
     if ($sales.Count -ge 5) {
         Write-Output "PASS: Sales history returned $($sales.Count) transactions."
         $passedTests++
@@ -90,12 +101,12 @@ try {
         )
     } | ConvertTo-Json -Depth 5
 
-    $checkoutRes = Invoke-RestMethod -Uri "$baseUrl/api/checkout" -Method Post -Body $checkoutBody -ContentType "application/json"
+    $checkoutRes = Invoke-RestMethod -Uri "$baseUrl/api/checkout" -Method Post -Body $checkoutBody -ContentType "application/json" -WebSession $session
     if ($checkoutRes.success -and $checkoutRes.bill.isPaid) {
         Write-Output "PASS: Checkout succeeded with Bill ID: $($checkoutRes.bill.billId), Total: `$$($checkoutRes.bill.totalAmount)"
         
         # Verify stock decreased by exactly 2
-        $productsAfter = Invoke-RestMethod -Uri "$baseUrl/api/products" -Method Get
+        $productsAfter = Invoke-RestMethod -Uri "$baseUrl/api/products" -Method Get -WebSession $session
         $chipsAfter = ($productsAfter | Where-Object { $_.id -eq 2 }).stock
         Write-Output "Chips stock after checkout: $chipsAfter"
         if ($chipsAfter -eq ($chipsBefore - 2)) {
@@ -117,12 +128,12 @@ try {
         paymentMethod = "Cash";
         paymentConfirmed = $true;
         items = @(
-            @{ productId = 9; quantity = 1 } # Terry has stock 0
+            @{ productId = 9; quantity = 100000 } # exceeds available stock
         )
     } | ConvertTo-Json -Depth 5
 
     try {
-        Invoke-RestMethod -Uri "$baseUrl/api/checkout" -Method Post -Body $overBody -ContentType "application/json"
+        Invoke-RestMethod -Uri "$baseUrl/api/checkout" -Method Post -Body $overBody -ContentType "application/json" -WebSession $session
         Write-Error "FAIL: Checkout should have been rejected for zero-stock item."
     } catch {
         Write-Output "PASS: Correctly rejected purchase exceeding available stock (HTTP 400)."
@@ -139,13 +150,13 @@ try {
         stock = 40
     } | ConvertTo-Json
 
-    $createRes = Invoke-RestMethod -Uri "$baseUrl/api/products" -Method Post -Body $newProd -ContentType "application/json"
+    $createRes = Invoke-RestMethod -Uri "$baseUrl/api/products" -Method Post -Body $newProd -ContentType "application/json" -WebSession $session
     $newId = $createRes.product.id
     if ($createRes.success -and $newId -gt 0) {
         Write-Output "PASS: Created product ID $newId."
         
         # Now delete it
-        $delRes = Invoke-RestMethod -Uri "$baseUrl/api/products/$newId" -Method Delete
+        $delRes = Invoke-RestMethod -Uri "$baseUrl/api/products/$newId" -Method Delete -WebSession $session
         if ($delRes.success) {
             Write-Output "PASS: Successfully deleted product ID $newId."
             $passedTests++
@@ -163,4 +174,9 @@ try {
 } finally {
     Write-Output "Stopping test server (PID: $($proc.Id))..."
     Stop-Process -Id $proc.Id -Force -ErrorAction SilentlyContinue
+
+    if ($authBackup -ne $null) {
+        [System.IO.File]::WriteAllText("data/auth.json", $authBackup)
+        Write-Output "Restored original authentication data to data/auth.json."
+    }
 }

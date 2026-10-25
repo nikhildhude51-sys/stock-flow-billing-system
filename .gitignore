@@ -22,14 +22,32 @@ cmake_install.cmake
 install_manifest.txt
 compile_commands.json
 
-# Logs, diagnostics, and temporary files
+# Logs, diagnostics, crash dumps, and temporary files
 *.log
 *.tmp
 *.bak
+*.dmp
+core
 
-# Environment and secrets
+# Runtime databases and sensitive JSON data
+data/*.json
+!data/.gitkeep
+auth.json
+inventory.json
+sales.json
+*.json.bak
+
+# Test-generated files and exported reports
+data/auth_test_*.json
+test_*.json
+*.csv
+
+# Environment, secrets, and certificates
 .env
 .env.*
+*.pem
+*.key
+*.crt
 
 # OS generated files
 Thumbs.db
@@ -41,3 +59,4 @@ Desktop.ini
 .vscode/
 .idea/
 *.user
+*.suo
