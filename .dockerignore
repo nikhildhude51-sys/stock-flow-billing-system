@@ -1,0 +1,35 @@
+# Git and Version Control
+.git/
+.gitignore
+
+# Build outputs, cache, and Windows binaries
+build/
+bin/
+out/
+*.exe
+*.obj
+*.o
+*.a
+*.lib
+*.dll
+*.log
+*.tmp
+*.bak
+
+# IDE & Editor files
+.vscode/
+.idea/
+*.user
+
+# Local runtime data, passwords, and secrets (NEVER copy into Docker image)
+data/*.json
+data/auth.json
+data/inventory.json
+data/sales.json
+*.csv
+.env
+.env.*
+
+# Local test & utility scripts
+*.ps1
+*.bat

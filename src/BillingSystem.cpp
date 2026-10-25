@@ -17,7 +17,15 @@ bool BillingSystem::loadAllData() {
 
     // 1. Load Inventory
     bool invLoaded = inventory_.loadFromFile(inventoryFilePath_);
-    if (!invLoaded) {
+    if (!invLoaded && inventory_.getProductCount() == 0) {
+        std::cout << "[BillingSystem] Initializing default catalog for fresh deployment: " << inventoryFilePath_ << std::endl;
+        inventory_.addProduct("Coffee", 4.50, 100);
+        inventory_.addProduct("Tea", 3.25, 80);
+        inventory_.addProduct("Sandwich", 8.99, 50);
+        inventory_.addProduct("Muffin", 3.75, 40);
+        inventory_.addProduct("Chips", 2.49, 100);
+        inventory_.saveToFile(inventoryFilePath_);
+    } else if (!invLoaded) {
         std::cout << "[BillingSystem] Could not load inventory from " << inventoryFilePath_
                   << ". Existing file will be used or defaults created." << std::endl;
     }

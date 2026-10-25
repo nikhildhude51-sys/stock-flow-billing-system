@@ -20,13 +20,18 @@ set(SOURCES
     src/main.cpp
 )
 
+# Threading support for Crow and Asio across Linux and Windows
+find_package(Threads REQUIRED)
+
 # Server executable
 add_executable(server ${SOURCES})
 
-# Windows network and socket libraries + static runtime linkage
+# Platform-specific socket and threading libraries
 if(WIN32)
-    target_link_libraries(server PRIVATE ws2_32 mswsock)
+    target_link_libraries(server PRIVATE ws2_32 mswsock Threads::Threads)
     target_link_options(server PRIVATE -static -static-libgcc -static-libstdc++)
+else()
+    target_link_libraries(server PRIVATE Threads::Threads)
 endif()
 
 # Automated Test Executable
@@ -40,6 +45,8 @@ add_executable(test_auth
 )
 
 if(WIN32)
-    target_link_libraries(test_auth PRIVATE ws2_32 mswsock)
+    target_link_libraries(test_auth PRIVATE ws2_32 mswsock Threads::Threads)
     target_link_options(test_auth PRIVATE -static -static-libgcc -static-libstdc++)
+else()
+    target_link_libraries(test_auth PRIVATE Threads::Threads)
 endif()

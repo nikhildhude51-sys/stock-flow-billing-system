@@ -142,6 +142,9 @@ int main(int argc, char* argv[]) {
     std::cout << " Host: " << bindAddress << " | Port: " << port << "\n";
     std::cout << "========================================================\n";
 
+    // Ensure runtime data directory exists
+    std::filesystem::create_directories("data");
+
     // 1. Initialize central BillingSystem object (loads local JSON files)
     BillingSystem billingSystem("data/inventory.json", "data/sales.json");
 
