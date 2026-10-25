@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Inventory Management and Billing System</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <div class="app-layout">
+    <!-- Left Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <h2 class="logo-title">Admin Panel</h2>
+      </div>
+
+      <nav class="sidebar-nav">
+        <a href="#dashboard" class="nav-item active" data-page="dashboard">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+            <polyline points="9 22 9 12 15 12 15 22"/>
+          </svg>
+          <span>Dashboard</span>
+        </a>
+
+        <a href="#pos" class="nav-item" data-page="pos">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="8" cy="21" r="1"/>
+            <circle cx="19" cy="21" r="1"/>
+            <path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/>
+          </svg>
+          <span>POS</span>
+        </a>
+
+        <a href="#products" class="nav-item" data-page="products">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="m7.5 4.27 9 5.15"/>
+            <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/>
+            <path d="m3.3 7 8.7 5 8.7-5"/>
+            <path d="M12 22V12"/>
+          </svg>
+          <span>Products</span>
+        </a>
+
+        <a href="#customers" class="nav-item" data-page="customers">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+            <circle cx="9" cy="7" r="4"/>
+            <path d="M22 21v-2a4 4 0 0 0-3-3.87"/>
+            <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+          </svg>
+          <span>Customers</span>
+        </a>
+
+        <a href="#sales" class="nav-item" data-page="sales">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect width="18" height="18" x="3" y="3" rx="2"/>
+            <path d="M9 9h6"/>
+            <path d="M9 13h6"/>
+            <path d="M9 17h4"/>
+            <line x1="12" x2="12" y1="7" y2="17"/>
+          </svg>
+          <span>Sales</span>
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <a href="#signout" class="nav-item signout-btn" id="signOutBtn">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+            <polyline points="16 17 21 12 16 7"/>
+            <line x1="21" x2="9" y1="12" y2="12"/>
+          </svg>
+          <span>Sign Out</span>
+        </a>
+      </div>
+    </aside>
+
+    <!-- Main Container -->
+    <main class="main-content">
+      <!-- Top Bar with Sun Theme Toggle & Profile Avatar -->
+      <header class="top-header">
+        <div class="top-header-right">
+          <button class="icon-btn" id="themeToggleBtn" title="Toggle Theme" aria-label="Toggle theme">
+            <svg class="theme-icon sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="4"/>
+              <path d="M12 2v2"/>
+              <path d="M12 20v2"/>
+              <path d="m4.93 4.93 1.41 1.41"/>
+              <path d="m17.66 17.66 1.41 1.41"/>
+              <path d="M2 12h2"/>
+              <path d="M20 12h2"/>
+              <path d="m6.34 17.66-1.41 1.41"/>
+              <path d="m19.07 4.93-1.41 1.41"/>
+            </svg>
+          </button>
+          <div class="profile-avatar" title="Admin User">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="8" r="4"/>
+              <path d="M20 21a8 8 0 1 0-16 0"/>
+            </svg>
+          </div>
+        </div>
+      </header>
+
+      <!-- View Containers (Switched dynamically) -->
+      <div class="content-body">
+        
+        <!-- ======================================================== -->
+        <!-- 1. DASHBOARD PAGE                                        -->
+        <!-- ======================================================== -->
+        <section id="dashboardPage" class="page-view">
+          <div class="page-header">
+            <h1 class="page-title">Dashboard</h1>
+            <p class="page-subtitle">Overview of your inventory and sales.</p>
+          </div>
+
+          <!-- 3 Stats Cards -->
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-icon-wrapper">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/>
+                  <path d="m3.3 7 8.7 5 8.7-5"/>
+                  <path d="M12 22V12"/>
+                </svg>
+              </div>
+              <div class="stat-info">
+                <span class="stat-label">Total Products</span>
+                <span class="stat-value" id="dashTotalProducts">0</span>
+              </div>
+            </div>
+
+            <div class="stat-card">
+              <div class="stat-icon-wrapper">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/>
+                  <path d="m3.3 7 8.7 5 8.7-5"/>
+                  <path d="M12 22V12"/>
+                </svg>
+              </div>
+              <div class="stat-info">
+                <span class="stat-label">Units in Stock</span>
+                <span class="stat-value" id="dashUnitsInStock">0</span>
+              </div>
+            </div>
+
+            <div class="stat-card">
+              <div class="stat-icon-wrapper">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                  <polyline points="14 2 14 8 20 8"/>
+                  <line x1="16" x2="8" y1="13" y2="13"/>
+                  <line x1="16" x2="8" y1="17" y2="17"/>
+                  <polyline points="10 9 9 9 8 9"/>
+                </svg>
+              </div>
+              <div class="stat-info">
+                <span class="stat-label">Completed Sales</span>
+                <span class="stat-value" id="dashCompletedSales">0</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Recent Sales Table Card -->
+          <div class="card recent-sales-card">
+            <div class="card-header">
+              <h3 class="card-title">Recent Sales</h3>
+              <a href="#sales" class="view-all-link" id="dashViewAllSales">View All</a>
+            </div>
+            <div class="table-container">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Bill ID</th>
+                    <th>Date</th>
+                    <th>Items</th>
+                    <th>Total</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody id="dashRecentSalesBody">
+                  <!-- Rendered dynamically -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ======================================================== -->
+        <!-- 2. POINT OF SALE (POS) PAGE                              -->
+        <!-- ======================================================== -->
+        <section id="posPage" class="page-view">
+          <div class="page-header">
+            <h1 class="page-title">Point of Sale</h1>
+            <p class="page-subtitle">Process new sales and manage transactions.</p>
+          </div>
+
+          <div class="pos-layout">
+            <!-- Left: Products Section -->
+            <div class="pos-products-container">
+              <div class="pos-products-header">
+                <h3 class="section-title">Products</h3>
+                <div class="search-bar">
+                  <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="11" cy="11" r="8"/>
+                    <line x1="21" x2="16.65" y1="21" y2="16.65"/>
+                  </svg>
+                  <input type="text" id="posSearchInput" placeholder="Search products...">
+                </div>
+              </div>
+
+              <!-- Product Cards 3-column Grid -->
+              <div class="product-cards-grid" id="posProductGrid">
+                <!-- Rendered dynamically -->
+              </div>
+            </div>
+
+            <!-- Right: Shopping Cart Section -->
+            <div class="pos-cart-container">
+              <div class="card cart-card">
+                <h3 class="cart-title">Cart</h3>
+                
+                <div class="form-group customer-select-group">
+                  <label for="posCustomerSelect">Customer</label>
+                  <div class="select-wrapper">
+                    <select id="posCustomerSelect">
+                      <option value="Walk-in Customer" selected>Walk-in Customer</option>
+                    </select>
+                    <svg class="select-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <polyline points="6 9 12 15 18 9"/>
+                    </svg>
+                  </div>
+                </div>
+
+                <!-- Cart Items List -->
+                <div class="cart-items-list" id="posCartList">
+                  <!-- Rendered dynamically -->
+                </div>
+
+                <!-- Cart Footer / Total -->
+                <div class="cart-summary">
+                  <div class="cart-total-row">
+                    <span class="total-label">Total:</span>
+                    <span class="total-value" id="posCartTotal">$0.00</span>
+                  </div>
+                  <button class="btn btn-primary btn-block btn-process-sale" id="posProcessSaleBtn">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <line x1="12" x2="12" y1="2" y2="22"/>
+                      <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+                    </svg>
+                    <span>Process Sale</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ======================================================== -->
+        <!-- 3. PRODUCTS PAGE                                         -->
+        <!-- ======================================================== -->
+        <section id="productsPage" class="page-view">
+          <div class="page-header">
+            <h1 class="page-title">Products</h1>
+            <p class="page-subtitle">Manage inventory items and stock.</p>
+          </div>
+
+          <div class="products-layout">
+            <!-- Left: Products List Table -->
+            <div class="products-table-container">
+              <div class="products-action-bar">
+                <button class="btn btn-primary" id="openAddProductBtn">
+                  <span>+ Add Product</span>
+                </button>
+                <div class="search-bar">
+                  <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="11" cy="11" r="8"/>
+                    <line x1="21" x2="16.65" y1="21" y2="16.65"/>
+                  </svg>
+                  <input type="text" id="productsSearchInput" placeholder="Search products...">
+                </div>
+              </div>
+
+              <div class="card table-card">
+                <div class="table-container">
+                  <table class="data-table">
+                    <thead>
+                      <tr>
+                        <th>Product ID</th>
+                        <th>Product Name</th>
+                        <th>Price</th>
+                        <th>Stock</th>
+                        <th class="text-center">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody id="productsTableBody">
+                      <!-- Rendered dynamically -->
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+
+            <!-- Right: Add / Edit Product Form Panel -->
+            <div class="product-form-panel" id="productFormPanel">
+              <div class="card form-card">
+                <div class="card-header">
+                  <h3 class="card-title" id="productFormTitle">Add Product</h3>
+                  <button class="close-btn" id="closeProductFormBtn" title="Close form">&times;</button>
+                </div>
+                <form id="productForm">
+                  <input type="hidden" id="editProductId" value="">
+                  
+                  <div class="form-group">
+                    <label for="productNameInput">Product Name</label>
+                    <input type="text" id="productNameInput" placeholder="Enter product name" required>
+                  </div>
+
+                  <div class="form-group">
+                    <label for="productPriceInput">Price</label>
+                    <input type="number" id="productPriceInput" step="0.01" min="0" placeholder="Enter price" required>
+                  </div>
+
+                  <div class="form-group">
+                    <label for="productStockInput">Quantity</label>
+                    <input type="number" id="productStockInput" min="0" placeholder="Enter stock quantity" required>
+                  </div>
+
+                  <button type="submit" class="btn btn-primary btn-block" id="saveProductBtn">
+                    <span>Save Product</span>
+                  </button>
+                </form>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ======================================================== -->
+        <!-- 4. SALES PAGE                                            -->
+        <!-- ======================================================== -->
+        <section id="salesPage" class="page-view">
+          <div class="page-header">
+            <h1 class="page-title">Sales</h1>
+            <p class="page-subtitle">View completed transactions and receipts.</p>
+          </div>
+
+          <!-- 3 Stats Cards for Sales -->
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-icon-wrapper">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                  <polyline points="14 2 14 8 20 8"/>
+                  <line x1="16" x2="8" y1="13" y2="13"/>
+                  <line x1="16" x2="8" y1="17" y2="17"/>
+                </svg>
+              </div>
+              <div class="stat-info">
+                <span class="stat-label">Total Sales</span>
+                <span class="stat-value" id="salesTotalRevenue">$0.00</span>
+              </div>
+            </div>
+
+            <div class="stat-card">
+              <div class="stat-icon-wrapper">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="8" cy="21" r="1"/>
+                  <circle cx="19" cy="21" r="1"/>
+                  <path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/>
+                </svg>
+              </div>
+              <div class="stat-info">
+                <span class="stat-label">Total Transactions</span>
+                <span class="stat-value" id="salesTotalTransactions">0</span>
+              </div>
+            </div>
+
+            <div class="stat-card">
+              <div class="stat-icon-wrapper">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/>
+                  <path d="m3.3 7 8.7 5 8.7-5"/>
+                  <path d="M12 22V12"/>
+                </svg>
+              </div>
+              <div class="stat-info">
+                <span class="stat-label">Total Items Sold</span>
+                <span class="stat-value" id="salesTotalItemsSold">0</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Sales Invoices Table Card -->
+          <div class="card table-card">
+            <div class="table-container">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Bill ID</th>
+                    <th>Date</th>
+                    <th>Items</th>
+                    <th>Total</th>
+                    <th>Status</th>
+                    <th class="text-center">Action</th>
+                  </tr>
+                </thead>
+                <tbody id="salesTableBody">
+                  <!-- Rendered dynamically -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ======================================================== -->
+        <!-- 5. CUSTOMERS PAGE                                        -->
+        <!-- ======================================================== -->
+        <section id="customersPage" class="page-view">
+          <div class="page-header">
+            <h1 class="page-title">Customers</h1>
+            <p class="page-subtitle">Customers for your sales.</p>
+          </div>
+
+          <div class="card table-card">
+            <div class="table-container">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Customer Name</th>
+                    <th>Type</th>
+                    <th>Sales</th>
+                  </tr>
+                </thead>
+                <tbody id="customersTableBody">
+                  <tr>
+                    <td class="font-medium">Walk-in Customer</td>
+                    <td><span class="badge badge-walkin">Walk-in</span></td>
+                    <td id="customersSalesCount">0</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Walk-in Customer Notice Banner -->
+          <div class="info-banner">
+            <svg class="info-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"/>
+              <line x1="12" x2="12" y1="16" y2="12"/>
+              <line x1="12" x2="12.01" y1="8" y2="8"/>
+            </svg>
+            <span>This system uses a single Walk-in Customer for all sales. No customer management is required for this project.</span>
+          </div>
+        </section>
+
+      </div>
+    </main>
+  </div>
+
+  <!-- ======================================================== -->
+  <!-- MODAL 1: PAYMENT CONFIRMATION MODAL                      -->
+  <!-- ======================================================== -->
+  <div class="modal-backdrop" id="paymentModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 class="modal-title">Confirm Payment</h3>
+        <button class="close-btn" id="closePaymentModalBtn">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p class="modal-desc">Review order details and select payment method to complete the checkout.</p>
+        
+        <div class="order-summary-box">
+          <div class="summary-row">
+            <span>Customer:</span>
+            <strong id="modalCustomerName">Walk-in Customer</strong>
+          </div>
+          <div class="summary-row">
+            <span>Items Count:</span>
+            <strong id="modalItemCount">0</strong>
+          </div>
+          <div class="summary-row summary-total-row">
+            <span>Total Payable:</span>
+            <strong id="modalTotalAmount">$0.00</strong>
+          </div>
+        </div>
+
+        <div class="form-group" style="margin-top: 16px;">
+          <label for="modalPaymentMethod">Payment Method</label>
+          <div class="select-wrapper">
+            <select id="modalPaymentMethod">
+              <option value="Cash" selected>Cash</option>
+              <option value="Card">Card</option>
+              <option value="UPI / Online">UPI / Online</option>
+            </select>
+            <svg class="select-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="6 9 12 15 18 9"/>
+            </svg>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" id="cancelPaymentBtn">Cancel</button>
+        <button class="btn btn-primary" id="confirmPaymentBtn">
+          <span>Confirm & Pay</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================================================== -->
+  <!-- MODAL 2: PRINTABLE RECEIPT / INVOICE MODAL               -->
+  <!-- ======================================================== -->
+  <div class="modal-backdrop" id="receiptModal">
+    <div class="modal-card receipt-card">
+      <div class="modal-header no-print">
+        <h3 class="modal-title">Sales Receipt</h3>
+        <button class="close-btn" id="closeReceiptModalBtn">&times;</button>
+      </div>
+      <div class="modal-body" id="receiptPrintArea">
+        <div class="receipt-header">
+          <h2>Store Receipt</h2>
+          <p class="store-sub">Inventory Management & Billing System</p>
+          <div class="receipt-meta">
+            <div><strong>Invoice:</strong> <span id="receiptBillId">INV-1001</span></div>
+            <div><strong>Date:</strong> <span id="receiptDate">Oct 23, 2026 14:32</span></div>
+            <div><strong>Customer:</strong> <span id="receiptCustomer">Walk-in Customer</span></div>
+            <div><strong>Payment:</strong> <span id="receiptMethod">Cash</span></div>
+          </div>
+        </div>
+
+        <table class="receipt-table">
+          <thead>
+            <tr>
+              <th>Item</th>
+              <th class="text-center">Qty</th>
+              <th class="text-right">Price</th>
+              <th class="text-right">Total</th>
+            </tr>
+          </thead>
+          <tbody id="receiptItemsBody">
+            <!-- Rendered dynamically -->
+          </tbody>
+        </table>
+
+        <div class="receipt-totals">
+          <div class="receipt-row">
+            <span>Subtotal:</span>
+            <span id="receiptSubtotal">$0.00</span>
+          </div>
+          <div class="receipt-row">
+            <span>Tax:</span>
+            <span id="receiptTax">$0.00</span>
+          </div>
+          <div class="receipt-row total-bold">
+            <span>Grand Total:</span>
+            <span id="receiptGrandTotal">$0.00</span>
+          </div>
+          <div class="receipt-badge-row">
+            <span class="badge badge-paid">PAID IN FULL</span>
+          </div>
+        </div>
+
+        <div class="receipt-footer">
+          <p>Thank you for your business!</p>
+        </div>
+      </div>
+      <div class="modal-footer no-print">
+        <button class="btn btn-secondary" id="closeReceiptBtn">Close</button>
+        <button class="btn btn-primary" id="printReceiptBtn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="6 9 6 2 18 2 18 9"/>
+            <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/>
+            <rect width="12" height="8" x="6" y="14"/>
+          </svg>
+          <span>Print Receipt</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div id="toastContainer" class="toast-container"></div>
+
+  <script src="/app.js"></script>
+</body>
+</html>
